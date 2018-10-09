@@ -1,0 +1,241 @@
+var dictionary=[["name":"luojialin","age":"20"],["name":"fanyunyi","age":"21"]]
+let age=dictionary.map{$0["age"]!}
+print(age)//1.(1)
+
+var array=["wo","jin","lin","is","20"]
+let newarray=array.filter{Int($0) != nil}
+print(newarray)//1.(2) 
+
+let connection=array.reduce("",{$0+","+$1})
+print(connection)//1.(3)
+
+let number=[1,2,3,4,5]
+let count=number.reduce((max:number[0],min:number[0],sum:0),{(max:max($0.max,$1),min:min($0.min,$1),sum:($0.sum+$1))})
+print(count)//1.(4)
+
+
+func a1(x:Int)->Int{
+    print("f1是一个参数为整型，返回值为整型的函数\n")
+    return 1
+}
+func a2()->String{
+    return "luo"
+}
+func a3(x:Double)->Double{
+    return x
+}
+
+let funcarray = [a1,a3,a3].filter{
+    return $0 is (Int)->Int
+}
+for (index,_) in funcarray.enumerated() {
+    print("符合条件的函数的下标是:\(index)")
+}//1.(5)
+
+extension Int{
+    mutating func sqrt()->Double{
+        let front:Double = Double(self)
+        let after:Double = front*front
+        return after
+    }
+}
+var x=2
+print(x.sqrt())//1.(6)
+
+func judgement<T:Comparable>(data:[T])->(max:T,min:T){
+    var max = data[0]
+    var min = data[0]
+    for i in data{
+        if max < i{
+            max = i
+        }else if min > i{
+            min = i
+        }
+    }
+    return (max,min)
+}
+let tempInt = judgement(data:[1,2,6,3])
+print("最大整数:\(tempInt.max),最小整数:\(tempInt.min)")
+
+let tempDouble = judgement(data:[1.1,2.2,9.2,0.1])
+print("最大浮点数:\(tempDouble.max),最小浮点数:\(tempDouble.min)")
+
+let tempString = judgement(data:["l","j","l"])
+print("最大字符串：最大为:\(tempString.max),最大字符串：\(tempString.min)")
+
+
+-----------------------------------------------------------------
+
+protocol SchoolProtocol{
+    var dep:Department{get}
+    func lendBook()
+}
+enum Department: String{
+    case one = "1"
+    case two = "2"
+
+}
+
+
+enum Gender:Int{
+    case female=0,male
+}
+
+class Person:CustomStringConvertible,SchoolProtocol{
+    var firstname:String
+    var lastname:String
+    var age:Int=0
+    var gender:Gender
+    var dep:Department
+    var fullname:String{
+        return firstname+lastname
+    }
+    
+    init(firstname:String,lastname:String,age:Int,gender:Gender,dep:Department){
+        self.firstname=firstname
+        self.lastname=lastname
+        self.age=age
+        self.gender=gender
+        self.dep=dep
+    }//指定构造函数
+    
+    convenience init(age:Int){
+        self.init(firstname:"Luo",lastname:"jialin",age:age,gender:Gender.male,dep:Department.one)
+    }//便利构造函数
+    
+    var description:String{
+        return "Name:\(firstname) \(lastname) age:\(age) gender:\(gender)"
+    }//直接用print输出输出输出
+
+    func run(){
+        print("Person \(self.fullname) is running!\n")
+    }
+
+    static func ==(one:Person,two:Person)->Bool{
+        return one.fullname==two.fullname&&one.age==two.age&&one.gender==two.gender
+    }
+    static func !=(one:Person,two:Person)->Bool{
+        return !(one==two)
+    }
+    func lendBook() {
+        print("Person")
+    }
+
+}
+
+class Teacher:Person{
+    var title:String
+    init(title:String,firstname:String,lastname:String,age:Int,gender:Gender,dep:Department){
+        self.title=title
+        super.init(firstname:firstname,lastname:lastname,age:age,gender:gender,dep:dep)
+    }
+    
+    
+    convenience init(title:String){
+        self.init(title:title,firstname:"wang",lastname:"dan",age:20,gender:Gender.female,dep:Department.two)
+    }
+    
+      override var description:String{
+        return "Title:\(title)"
+    }
+    
+    override func run(){
+        print("Teacher \(self.fullname) is running!\n")
+    }
+    
+    override func lendBook() {
+        print("Teacher")
+    }
+    
+}
+
+class Student:Person{
+    var stuNO:String
+    init(stuNO:String,firstname:String,lastname:String,age:Int,gender:Gender,dep:Department){
+        self.stuNO=stuNO
+        super.init(firstname:firstname,lastname:lastname,age:age,gender:gender,dep:dep)
+    }
+    
+    convenience init(stuNO:String){
+        self.init(stuNO:stuNO,firstname:"luo",lastname:"jialin",age:21,gender:Gender.male,dep:Department.one)
+    }
+    
+    
+    override var description:String{
+        return "stuNO:\(stuNO)"
+    }
+    
+    override func run(){
+        print("Student \(self.fullname) is running!\n")
+    }
+    
+    override func lendBook() {
+        print("Student")
+    }
+
+}
+
+var p1=Person(age:1)
+var p2=Person(age:2)
+print(p1)
+p1.run()
+print(p2)
+print(p1 != p2)//重载
+print(p1.description)//Person类输出
+var t1=Teacher(title:"jiaoshou")
+print(t1.description)//Teacher类输出输出输出
+var s1=Student(stuNO:"2016110325")
+var s2=Student(stuNO:"2016110301",firstname:"liu",lastname:"ha",age:10,gender:Gender.female,dep:Department.one)
+print(s1.description)
+
+var people=[p1,p2,t1,s1,s2]
+
+var dictionary=["Person":0,"Teacher":0,"Student":0]
+
+for count in people{
+    if count is Student{
+        dictionary["Student"]!+=1
+    }else if count is Teacher{
+        dictionary["Teacher"]!+=1
+    }else{
+        dictionary["Person"]!+=1
+    }
+}//将各对象个数输入字典
+
+for (key,value) in dictionary{
+    print("\(key):\(value)个")
+}
+
+print("按年龄排：")
+people.sort(by:{
+    $0.age<$1.age
+})
+
+print(people.description)
+
+print("按名字排：")
+people.sort(by:{
+    $0.fullname<$1.fullname
+})
+
+print(people)
+
+print("按性别年龄排：")
+people.sort(by:{
+    $0.age<$1.age&&$0.gender.rawValue<$1.gender.rawValue
+})
+
+print(people)
+
+for i in people{
+    i.run()
+    if i is Student{
+        i.lendBook()
+    }
+    if i is Teacher{
+        i.lendBook()
+    }
+    if i is Person{
+        i.lendBook()
+    }
+} 
