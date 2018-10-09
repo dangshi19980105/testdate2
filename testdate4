@@ -1,0 +1,82 @@
+import Foundation
+
+func getDate(date: Date, zone: Int = 0) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy年MM月dd日EEEE aa HH:mm"
+    formatter.locale = Locale.current  //中文设置
+    if zone >= 0 { //在东半区
+        formatter.timeZone = TimeZone(abbreviation: "UTC+\(zone):00")
+    } else {  //西半区
+        formatter.timeZone = TimeZone(abbreviation: "UTC+\(zone):00")
+    }
+    
+    let dateString = formatter.string(from: now)  //将日期变为字符串
+    return dateString
+}
+
+let now = Date()
+
+let beijing = getDate(date: now, zone: +8)
+print("北京: \(beijing)")
+
+let tokyo = getDate(date: now, zone: 9)
+print("东京: \(tokyo)")
+
+let newyork = getDate(date: now, zone: -5)
+print("纽约: \(newyork)")
+
+let london = getDate(date: now)
+print("伦敦: \(london)")
+
+//-------------------以上为第一题----------------
+
+let sentence="Swift is a powerful and intuitive programming language for iOS, OS X, tvOS, and watchOS."
+
+let startIndex = sentence.index(sentence.startIndex, offsetBy: 5)
+let endIndex = sentence.index(sentence.startIndex, offsetBy: 19)
+
+print(sentence[startIndex...endIndex])//截取6-20字符
+
+print(sentence.replacingOccurrences(of: "OS", with: ""))//删除OS字符
+
+//------------------以上为第二题-----------------
+
+let dic = ["date": ["beijing": beijing, "tokyo": tokyo, "newyork": newyork, "london": london],"String":sentence] as AnyObject //将字典转换为任意类型，方便后面写入文件
+
+let defaultDoc = FileManager.default  //获取默认工作路径
+//获取工作路径下的Document文件夹
+if var path = defaultDoc.urls(for: .documentDirectory, in: .userDomainMask).first?.path {
+    path.append("LJLtest.txt")  //在文件夹路径下增加一个test.txt
+    print(path)
+    print(dic.write(toFile: path, atomically: true))  //新建上面指定的文件，并将数据写入(输出: true)
+}
+
+//-------------------以上为第三题----------------
+
+let image = try Data(contentsOf: URL(string: " https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=768437897,3742074289&fm=27&gp=0.jpg")!) //通过指定的url获取图片，并转换为二进制数据
+
+if var url = defaultDoc.urls(for: .documentDirectory, in: .userDomainMask).first {
+    url.appendPathComponent("LJLimage.png")
+    print(url)
+    try image.write(to: url)  //将转换后的二进制数据存储为png图片
+}
+
+//-------------------以上为第四题----------------
+
+let url = URL(string: " http://www.weather.com.cn/data/sk/101110101.html")! //api的路径
+//let str = try String(contentsOf: url)
+//print(str)  //显示json数据内容
+let data = try Data(contentsOf: url)  //将json转换为二进制数据
+let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments)  //序列化json
+
+//解析json数据
+if let dic1 = json as? [String: Any] {
+    if let weather = dic1["weatherinfo"] as? [String: Any] {
+        let city = weather["city"]!
+        let temp = weather["temp"]!
+        let wd = weather["WD"]!
+        let ws = weather["WS"]!
+        print("城市: \(city), 温度: \(temp), 风向: \(wd), 风力: \(ws)")
+        //输出: 城市: 西安, 温度: 20, 风向: 西南风, 风力: 1级
+    }
+} 
